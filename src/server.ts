@@ -22,6 +22,10 @@ app.get('/health', (_request, response) => {
   response.json({ success: true, message: 'Server aktif.' });
 });
 
-app.listen(port, () => {
-  console.log(`Server berjalan di http://localhost:${port}`);
-});
+if (process.env.VERCEL !== '1') {
+  app.listen(port, () => {
+    console.log(`Server berjalan di http://localhost:${port}`);
+  });
+}
+
+export default app;

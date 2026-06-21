@@ -52,170 +52,6 @@
       loadStudents();
     }
   }
-
-  function getStoredTheme() {
-    var theme = localStorage.getItem("theme");
-    if (theme === "light" || theme === "dark") {
-      return theme;
-    }
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-
-  function applyTheme(theme) {
-    document.body.classList.toggle("dark-theme", theme === "dark");
-    if (themeToggleButton) {
-      themeToggleButton.textContent = theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
-    }
-    localStorage.setItem("theme", theme);
-    drawStudentChart();
-  }
-
-  function toggleTheme() {
-    var current = document.body.classList.contains("dark-theme") ? "dark" : "light";
-    applyTheme(current === "dark" ? "light" : "dark");
-  }
-
-  function updateTableSummary() {
-    if (!tableSummary) {
-      return;
-    }
-    var total = currentStudents.length;
-    var start = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-    var end = Math.min(total, currentPage * pageSize);
-    tableSummary.textContent = `Menampilkan ${start}-${end} dari ${total} mahasiswa`;
-  }
-
-  function renderPagination() {
-    if (!paginationContainer) {
-      return;
-    }
-    var totalPages = Math.max(1, Math.ceil(currentStudents.length / pageSize));
-    paginationContainer.innerHTML = "";
-    function createButton(label, page, disabled, active) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.textContent = label;
-      if (disabled) {
-        button.classList.add("disabled");
-        button.disabled = true;
-      }
-      if (active) {
-        button.classList.add("active");
-      }
-      button.addEventListener("click", function() {
-        currentPage = page;
-        renderStudents();
-        renderPagination();
-        updateTableSummary();
-      });
-      return button;
-    }
-    paginationContainer.appendChild(createButton("‹", Math.max(1, currentPage - 1), currentPage === 1, false));
-    var startPage = Math.max(1, currentPage - 2);
-    var endPage = Math.min(totalPages, currentPage + 2);
-    if (startPage > 1) {
-      paginationContainer.appendChild(createButton("1", 1, false, currentPage === 1));
-      if (startPage > 2) {
-        var dots = document.createElement("span");
-        dots.textContent = "…";
-        paginationContainer.appendChild(dots);
-      }
-    }
-    for (var page = startPage; page <= endPage; page += 1) {
-      paginationContainer.appendChild(createButton(String(page), page, false, page === currentPage));
-    }
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        var dots2 = document.createElement("span");
-        dots2.textContent = "…";
-        paginationContainer.appendChild(dots2);
-      }
-      paginationContainer.appendChild(createButton(String(totalPages), totalPages, false, currentPage === totalPages));
-    }
-    paginationContainer.appendChild(createButton("›", Math.min(totalPages, currentPage + 1), currentPage === totalPages, false));
-  }
-
-  function drawStudentChart() {
-    if (!studentChart) {
-      return;
-    }
-    var ctx = studentChart.getContext("2d");
-    if (!ctx) {
-      return;
-    }
-    var counts = currentStudents.reduce(function(acc, student) {
-      var major = student.major || "Lainnya";
-      acc[major] = (acc[major] || 0) + 1;
-      return acc;
-    }, {});
-    var labels = Object.keys(counts);
-    var values = labels.map(function(label) {
-      return counts[label];
-    });
-    var rect = studentChart.getBoundingClientRect();
-    var dpr = window.devicePixelRatio || 1;
-    var width = rect.width;
-    var height = rect.height;
-    studentChart.width = Math.max(width, 300) * dpr;
-    studentChart.height = Math.max(height, 220) * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-    var isDark = document.body.classList.contains("dark-theme");
-    var bg = getComputedStyle(document.body).getPropertyValue("--surface").trim() || "#ffffff";
-    var textColor = isDark ? "#e2e8f0" : "#111827";
-    var axisColor = isDark ? "rgba(226, 232, 240, 0.5)" : "rgba(15, 23, 42, 0.2)";
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, width, height);
-    ctx.font = "600 14px Inter, system-ui, sans-serif";
-    ctx.fillStyle = textColor;
-    ctx.textBaseline = "middle";
-    if (labels.length === 0) {
-      ctx.fillStyle = axisColor;
-      ctx.textAlign = "center";
-      ctx.fillText("Belum ada data mahasiswa untuk grafik.", width / 2, height / 2);
-      return;
-    }
-    var chartLeft = 40;
-    var chartRight = width - 20;
-    var chartTop = 24;
-    var chartBottom = height - 50;
-    ctx.strokeStyle = axisColor;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(chartLeft, chartTop);
-    ctx.lineTo(chartLeft, chartBottom);
-    ctx.lineTo(chartRight, chartBottom);
-    ctx.stroke();
-    var maxValue = Math.max.apply(null, values);
-    var step = Math.max(1, Math.ceil(maxValue / 4));
-    for (var tick = 0; tick <= 4; tick += 1) {
-      var y = chartBottom - (chartBottom - chartTop) * (tick / 4);
-      ctx.strokeStyle = isDark ? "rgba(226, 232, 240, 0.12)" : "rgba(15, 23, 42, 0.08)";
-      ctx.beginPath();
-      ctx.moveTo(chartLeft, y);
-      ctx.lineTo(chartRight, y);
-      ctx.stroke();
-      ctx.fillStyle = textColor;
-      ctx.textAlign = "right";
-      ctx.fillText(String(step * tick), chartLeft - 8, y);
-    }
-    var barWidth = Math.min(72, (chartRight - chartLeft) / labels.length * 0.6);
-    var gap = ((chartRight - chartLeft) - barWidth * labels.length) / Math.max(1, labels.length - 1);
-    labels.forEach(function(label, index) {
-      var value = values[index];
-      var barHeight = ((chartBottom - chartTop) * value) / (step * 4 || 1);
-      var x = chartLeft + index * (barWidth + gap);
-      var y = chartBottom - barHeight;
-      ctx.fillStyle = "rgba(79, 70, 229, 0.9)";
-      ctx.fillRect(x, y, barWidth, barHeight);
-      ctx.fillStyle = textColor;
-      ctx.textAlign = "center";
-      ctx.fillText(String(value), x + barWidth / 2, y - 12);
-      ctx.font = "500 12px Inter, system-ui, sans-serif";
-      ctx.fillText(label, x + barWidth / 2, chartBottom + 18);
-      ctx.font = "600 14px Inter, system-ui, sans-serif";
-    });
-  }
   async function requestJson(url, options = {}) {
     const headers = new Headers(options.headers);
     headers.set("Content-Type", "application/json");
@@ -276,40 +112,154 @@
   });
   async function loadStudents() {
     try {
-      var query = new URLSearchParams({
+      const query = new URLSearchParams({
         keyword: keywordInput.value,
         searchMethod: searchMethodSelect.value,
         sortMethod: sortMethodSelect.value,
         sortKey: sortKeySelect.value
       });
-      var result = await requestJson(`/api/students?${query.toString()}`);
+      const result = await requestJson(`/api/students?${query.toString()}`);
       currentStudents = result.data || [];
       currentPage = 1;
-      renderStudents();
-      renderPagination();
-      updateTableSummary();
-      drawStudentChart();
+      renderStudentPage();
+      renderChart();
     } catch (error) {
       setMessage(studentMessage, error instanceof Error ? error.message : "Gagal memuat data.", "error");
     }
   }
-  function renderStudents() {
+  function renderStudentPage() {
+    const totalStudents = currentStudents.length;
+    const totalPages = Math.max(1, Math.ceil(totalStudents / pageSize));
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+    }
+    const start = (currentPage - 1) * pageSize;
+    const pagedStudents = currentStudents.slice(start, start + pageSize);
+    renderStudents(pagedStudents);
+    tableSummary.textContent = `Menampilkan ${pagedStudents.length} dari ${totalStudents} mahasiswa`;
+    renderPagination(totalPages);
+  }
+  function renderPagination(totalPages) {
+    paginationContainer.innerHTML = "";
+    if (totalPages <= 1) {
+      return;
+    }
+    const createButton = (label, page, disabled = false, active = false) => {
+      const button = document.createElement("button");
+      button.textContent = label;
+      button.disabled = disabled;
+      button.className = active ? "active" : "";
+      if (!disabled && !active) {
+        button.addEventListener("click", () => {
+          currentPage = page;
+          renderStudentPage();
+        });
+      }
+      return button;
+    };
+    paginationContainer.appendChild(createButton("\u2190", currentPage - 1, currentPage === 1));
+    for (let page = 1; page <= totalPages; page += 1) {
+      paginationContainer.appendChild(createButton(String(page), page, false, page === currentPage));
+    }
+    paginationContainer.appendChild(createButton("\u2192", currentPage + 1, currentPage === totalPages));
+  }
+  function renderChart() {
+    const ctx = studentChart.getContext("2d");
+    if (!ctx) {
+      return;
+    }
+    const counts = currentStudents.reduce((acc, student) => {
+      acc[student.major] = (acc[student.major] || 0) + 1;
+      return acc;
+    }, {});
+    const labels = Object.keys(counts);
+    const values = Object.values(counts);
+    const canvasWidth = studentChart.clientWidth;
+    const canvasHeight = studentChart.clientHeight;
+    const pixelRatio = window.devicePixelRatio || 1;
+    studentChart.width = canvasWidth * pixelRatio;
+    studentChart.height = canvasHeight * pixelRatio;
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillStyle = "transparent";
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    const canvasColor = getComputedStyle(document.body).getPropertyValue("--muted").trim() || "#94a3b8";
+    const canvasText = getComputedStyle(document.body).getPropertyValue("--text").trim() || "#111827";
+    if (labels.length === 0) {
+      ctx.fillStyle = canvasColor;
+      ctx.font = "18px Inter, system-ui, sans-serif";
+      ctx.fillText("Tidak ada data untuk ditampilkan.", 20, 48);
+      return;
+    }
+    const maxValue = Math.max(...values);
+    const barWidth = Math.min(64, (canvasWidth - 64) / labels.length - 16);
+    const chartHeight = canvasHeight - 90;
+    const chartLeft = 48;
+    const chartBottom = canvasHeight - 40;
+    const palette = ["#4f46e5", "#3b82f6", "#2563eb", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#14b8a6"];
+    ctx.font = "600 14px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "var(--muted)";
+    ctx.textAlign = "left";
+    labels.forEach((label, index) => {
+      const x = chartLeft + index * (barWidth + 32);
+      const value = counts[label];
+      const barHeight = value / maxValue * chartHeight;
+      ctx.fillStyle = palette[index % palette.length];
+      ctx.fillRect(x, chartBottom - barHeight, barWidth, barHeight);
+      ctx.fillStyle = "var(--text)";
+      ctx.textAlign = "center";
+      ctx.fillText(String(value), x + barWidth / 2, chartBottom - barHeight - 12);
+      ctx.fillStyle = "var(--muted)";
+      ctx.textAlign = "center";
+      ctx.fillText(label, x + barWidth / 2, chartBottom + 20);
+    });
+  }
+  function toggleTheme() {
+    const isDark = document.body.classList.toggle("dark-theme");
+    themeToggleButton.textContent = isDark ? "\u2600\uFE0F Light Mode" : "\u{1F319} Dark Mode";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }
+  function initializeTheme() {
+    const storedTheme = localStorage.getItem("theme");
+    const isDark = storedTheme === "dark" || !storedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (isDark) {
+      document.body.classList.add("dark-theme");
+      themeToggleButton.textContent = "\u2600\uFE0F Light Mode";
+    } else {
+      document.body.classList.remove("dark-theme");
+      themeToggleButton.textContent = "\u{1F319} Dark Mode";
+    }
+  }
+  themeToggleButton.addEventListener("click", toggleTheme);
+  refreshChartButton.addEventListener("click", renderChart);
+  window.addEventListener("resize", () => {
+    if (!dashboardSection.classList.contains("hidden")) {
+      renderChart();
+    }
+  });
+  function renderStudents(students) {
     studentTableBody.innerHTML = "";
-    var startIndex = (currentPage - 1) * pageSize;
-    var pageStudents = currentStudents.slice(startIndex, startIndex + pageSize);
-    if (pageStudents.length === 0) {
+    if (students.length === 0) {
       studentTableBody.innerHTML = '<tr><td colspan="6">Data tidak ditemukan.</td></tr>';
       return;
     }
-    pageStudents.forEach(function(student) {
-      var row = document.createElement("tr");
-      row.innerHTML = "\n      <td>" + student.nim + "</td>\n      <td>" + student.name + "</td>\n      <td>" + student.email + "</td>\n      <td>" + student.major + "</td>\n      <td>" + student.semester + "</td>\n      <td>\n        <div class=\"action-buttons\">\n          <button type=\"button\" data-action=\"edit\" data-nim=\"" + student.nim + "\">Edit</button>\n          <button type=\"button\" class=\"danger\" data-action=\"delete\" data-nim=\"" + student.nim + "\">Hapus</button>\n        </div>\n      </td>\n    ";
-      row.querySelector('[data-action="edit"]').addEventListener("click", function() {
-        fillEditForm(student);
-      });
-      row.querySelector('[data-action="delete"]').addEventListener("click", function() {
-        deleteStudent(student.nim);
-      });
+    students.forEach((student) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+      <td>${student.nim}</td>
+      <td>${student.name}</td>
+      <td>${student.email}</td>
+      <td>${student.major}</td>
+      <td>${student.semester}</td>
+      <td>
+        <div class="action-buttons">
+          <button type="button" data-action="edit" data-nim="${student.nim}">Edit</button>
+          <button type="button" class="danger" data-action="delete" data-nim="${student.nim}">Hapus</button>
+        </div>
+      </td>
+    `;
+      row.querySelector('[data-action="edit"]').addEventListener("click", () => fillEditForm(student));
+      row.querySelector('[data-action="delete"]').addEventListener("click", () => deleteStudent(student.nim));
       studentTableBody.appendChild(row);
     });
   }
@@ -368,22 +318,11 @@
     }
   }
   refreshButton.addEventListener("click", loadStudents);
-  keywordInput.addEventListener("input", function() {
-    loadStudents();
-  });
+  keywordInput.addEventListener("input", () => loadStudents());
   sortMethodSelect.addEventListener("change", loadStudents);
   sortKeySelect.addEventListener("change", loadStudents);
   searchMethodSelect.addEventListener("change", loadStudents);
   cancelEditButton.addEventListener("click", resetStudentForm);
-  if (themeToggleButton) {
-    themeToggleButton.addEventListener("click", toggleTheme);
-  }
-  if (refreshChartButton) {
-    refreshChartButton.addEventListener("click", drawStudentChart);
-  }
-  window.addEventListener("resize", function() {
-    drawStudentChart();
-  });
   importButton.addEventListener("click", async () => {
     const file = importFileInput.files?.[0];
     if (!file) {
@@ -408,7 +347,7 @@
       setMessage(studentMessage, error instanceof Error ? error.message : "Upload gagal.", "error");
     }
   });
-  applyTheme(getStoredTheme());
   var savedLoginState = localStorage.getItem("isLoggedIn") === "true";
+  initializeTheme();
   setLoggedIn(savedLoginState);
 })();
