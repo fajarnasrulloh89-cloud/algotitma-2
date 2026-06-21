@@ -4,7 +4,7 @@
   "description": "Web Manajemen Data Mahasiswa dengan TypeScript, CRUD, File I/O, Import/Export, OTP Email, Searching, Sorting, dan OOP.",
   "main": "dist/server.js",
   "scripts": {
-    "build:client": "esbuild src/client/app.ts --bundle --outfile=public/app.js --format=iife",
+    "build:client": "npx esbuild src/client/app.ts --bundle --outfile=public/app.js --format=iife",
     "build": "npm run build:client && tsc",
     "dev": "npm run build:client && ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "node dist/server.js"
