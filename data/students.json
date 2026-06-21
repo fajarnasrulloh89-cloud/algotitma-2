@@ -1,0 +1,26 @@
+[
+  {
+    "id": "std-001",
+    "nim": "202401001",
+    "name": "Ahmad Fauzi",
+    "email": "ahmad@example.com",
+    "major": "Teknik Informatika",
+    "semester": 3
+  },
+  {
+    "id": "std-002",
+    "nim": "202401002",
+    "name": "Siti Aminah",
+    "email": "siti@example.com",
+    "major": "Sistem Informasi",
+    "semester": 2
+  },
+  {
+    "id": "std-1782014292146",
+    "nim": "241509888",
+    "name": "dadang",
+    "email": "dadang69@gmail.com",
+    "major": "teknik informatika",
+    "semester": 3
+  }
+]

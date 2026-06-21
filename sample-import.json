@@ -1,0 +1,20 @@
+{
+  "students": [
+    {
+      "id": "std-201",
+      "nim": "202402001",
+      "name": "Rina Amelia",
+      "email": "rina@example.com",
+      "major": "Teknik Informatika",
+      "semester": 1
+    },
+    {
+      "id": "std-202",
+      "nim": "202402002",
+      "name": "Andi Pratama",
+      "email": "andi@example.com",
+      "major": "Sistem Informasi",
+      "semester": 3
+    }
+  ]
+}

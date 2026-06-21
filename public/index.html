@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manajemen Data Mahasiswa</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="hero">
+        <div>
+          <p class="badge">TypeScript + Express + File I/O</p>
+          <h1>Manajemen Data Mahasiswa</h1>
+          <p class="subtitle">Login, CRUD, import/export, OTP email, regex validation, searching, sorting, dan OOP.</p>
+        </div>
+        <button id="logoutButton" class="secondary hidden">Logout</button>
+      </section>
+
+      <section id="loginSection" class="card narrow-card">
+        <h2>Login Admin</h2>
+        <p class="hint">Default: <b>admin</b> / <b>Admin123!</b></p>
+        <form id="loginForm" class="form-grid">
+          <label>
+            Username
+            <input id="usernameInput" type="text" placeholder="admin" required />
+          </label>
+          <label>
+            Password
+            <input id="passwordInput" type="password" placeholder="Admin123!" required />
+          </label>
+          <button type="submit">Login</button>
+        </form>
+        <p id="loginMessage" class="message"></p>
+
+        <hr />
+
+        <h3>OTP / Verifikasi Email</h3>
+        <form id="otpForm" class="form-grid">
+          <label>
+            Email tujuan
+            <input id="otpEmailInput" type="email" placeholder="nama@email.com" />
+          </label>
+          <button type="button" id="sendOtpButton">Kirim OTP</button>
+          <label>
+            Kode OTP
+            <input id="otpCodeInput" type="text" placeholder="6 digit" />
+          </label>
+          <button type="button" id="verifyOtpButton">Verifikasi OTP</button>
+        </form>
+        <p id="otpMessage" class="message"></p>
+      </section>
+
+      <section id="dashboardSection" class="hidden">
+        <section class="card">
+          <h2>Form Data Mahasiswa</h2>
+          <form id="studentForm" class="form-grid responsive-grid">
+            <input id="editModeInput" type="hidden" value="false" />
+            <label>
+              NIM
+              <input id="nimInput" type="text" placeholder="202401003" required />
+            </label>
+            <label>
+              Nama
+              <input id="nameInput" type="text" placeholder="Nama Mahasiswa" required />
+            </label>
+            <label>
+              Email
+              <input id="emailInput" type="email" placeholder="mahasiswa@email.com" required />
+            </label>
+            <label>
+              Jurusan
+              <input id="majorInput" type="text" placeholder="Teknik Informatika" required />
+            </label>
+            <label>
+              Semester
+              <input id="semesterInput" type="number" min="1" max="14" placeholder="1" required />
+            </label>
+            <div class="button-row">
+              <button type="submit" id="saveStudentButton">Simpan</button>
+              <button type="button" id="cancelEditButton" class="secondary">Batal Edit</button>
+            </div>
+          </form>
+          <p id="studentMessage" class="message"></p>
+        </section>
+
+        <section class="card">
+          <div class="toolbar">
+            <label>
+              Cari
+              <input id="keywordInput" type="text" placeholder="Nama atau NIM" />
+            </label>
+            <label>
+              Algoritma Search
+              <select id="searchMethodSelect">
+                <option value="linear">Linear Search by Nama</option>
+                <option value="sequential">Sequential Search by NIM</option>
+                <option value="binary">Binary Search by NIM</option>
+              </select>
+            </label>
+            <label>
+              Sorting
+              <select id="sortMethodSelect">
+                <option value="none">Tanpa Sorting</option>
+                <option value="bubble">Bubble Sort</option>
+                <option value="selection">Selection Sort</option>
+                <option value="insertion">Insertion Sort</option>
+                <option value="merge">Merge Sort</option>
+                <option value="shell">Shell Sort</option>
+              </select>
+            </label>
+            <label>
+              Kolom Sort
+              <select id="sortKeySelect">
+                <option value="nim">NIM</option>
+                <option value="name">Nama</option>
+                <option value="email">Email</option>
+                <option value="major">Jurusan</option>
+                <option value="semester">Semester</option>
+              </select>
+            </label>
+            <button type="button" id="refreshButton">Tampilkan Data</button>
+          </div>
+
+          <div class="import-export">
+            <div>
+              <label>
+                Unggah PDF/Gambar
+                <input id="importFileInput" type="file" accept=".pdf,.png,.jpg,.jpeg" />
+              </label>
+              <button type="button" id="importButton">Upload</button>
+            </div>
+            <div class="button-row">
+              <a class="button-link" href="/api/students/export/json">Export JSON</a>
+              <a class="button-link" href="/api/students/export/csv">Export CSV</a>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>NIM</th>
+                  <th>Nama</th>
+                  <th>Email</th>
+                  <th>Jurusan</th>
+                  <th>Semester</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="studentTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card complexity-card">
+          <h2>Estimasi Time Complexity</h2>
+          <ul>
+            <li>Tambah data mahasiswa: <b>O(n)</b> karena cek duplikasi NIM/email.</li>
+            <li>Tampilkan semua data: <b>O(n)</b>.</li>
+            <li>Linear/Sequential Search: <b>O(n)</b>.</li>
+            <li>Binary Search: <b>O(log n)</b> setelah data diurutkan.</li>
+            <li>Bubble/Selection/Insertion Sort: <b>O(n²)</b>.</li>
+            <li>Merge Sort: <b>O(n log n)</b>.</li>
+            <li>File I/O baca/tulis JSON: <b>O(n)</b> terhadap jumlah data.</li>
+          </ul>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "name": "manajemen-data-mahasiswa",
+  "version": "1.0.0",
+  "description": "Web Manajemen Data Mahasiswa dengan TypeScript, CRUD, File I/O, Import/Export, OTP Email, Searching, Sorting, dan OOP.",
+  "main": "dist/server.js",
+  "scripts": {
+    "build:client": "esbuild src/client/app.ts --bundle --outfile=public/app.js --format=iife",
+    "build": "npm run build:client && tsc",
+    "dev": "npm run build:client && ts-node-dev --respawn --transpile-only src/server.ts",
+    "start": "node dist/server.js"
+  },
+  "keywords": [
+    "typescript",
+    "express",
+    "crud",
+    "file-io",
+    "oop",
+    "student-management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^22.10.5",
+    "@types/nodemailer": "^6.4.17",
+    "esbuild": "^0.24.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.2"
+  }
+}
