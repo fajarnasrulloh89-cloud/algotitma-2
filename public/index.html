@@ -11,9 +11,12 @@
       <section class="hero">
         <div>
           <h1>Manajemen Data Mahasiswa</h1>
-          <p class="subtitle">Login, CRUD, import/export, OTP email, regex validation, searching, sorting, dan OOP.</p>
+          <p class="subtitle">Dashboard modern untuk mengelola data mahasiswa, dengan laporan, grafik, dan mode gelap/terang.</p>
         </div>
-        <button id="logoutButton" class="secondary hidden">Logout</button>
+        <div class="hero-actions">
+          <button id="themeToggleButton" class="secondary" type="button">🌙 Dark Mode</button>
+          <button id="logoutButton" class="secondary hidden" type="button">Logout</button>
+        </div>
       </section>
 
       <section id="loginSection" class="card narrow-card">
@@ -150,6 +153,22 @@
               <tbody id="studentTableBody"></tbody>
             </table>
           </div>
+
+          <div class="table-footer">
+            <div class="table-summary" id="tableSummary">Menampilkan 0 dari 0 mahasiswa</div>
+            <div class="pagination" id="paginationContainer"></div>
+          </div>
+        </section>
+
+        <section class="card chart-card">
+          <div class="card-header">
+            <div>
+              <h2>Grafik Mahasiswa</h2>
+              <p class="subtitle">Distribusi mahasiswa berdasarkan jurusan.</p>
+            </div>
+            <button id="refreshChartButton" type="button">Refresh Grafik</button>
+          </div>
+          <canvas id="studentChart" width="1000" height="420"></canvas>
         </section>
 
         <section class="card complexity-card">
