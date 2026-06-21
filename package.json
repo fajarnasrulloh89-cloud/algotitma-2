@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build:client": "node ./node_modules/esbuild/bin/esbuild src/client/app.ts --bundle --outfile=public/app.js --format=iife",
-    "build": "npm run build:client && npx tsc",
+    "build": "npm run build:client && node ./node_modules/typescript/bin/tsc",
     "dev": "npm run build:client && ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "node dist/server.js"
   },
